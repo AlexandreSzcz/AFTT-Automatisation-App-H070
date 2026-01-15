@@ -2,8 +2,8 @@ name: AFTT Automation (Weekly)
 
 on:
   schedule:
-    - cron: "0 5 * * 0"   # Tous les dimanches à 05:00 UTC
-  workflow_dispatch:      # Permet un lancement manuel
+    - cron: "0 5 * * 0"   # Dimanche 05:00 UTC (06:00 Belgique)
+  workflow_dispatch:
 
 jobs:
   run-scripts:
@@ -22,12 +22,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-
-      - name: 🔐 Create Google credentials file
-  run: |
-    echo '${{ secrets.GOOGLE_CREDENTIALS_JSON }}' > importrencontre.json
-
-
 
       - name: ⚛ Run rencontres
         run: python scripts/script_rencontre.py
