@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "importrencontre",
+  "private_key_id": "e0ccf9e9624017c448f38696e466c045b0b65bfc",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDZQ6R42B4hMcoV\n/rF6r64WrOOAVkHhzohT9imSq56qu7e1fmq7jtL2cCpz/+q5XFmFKL/O4ouKhBf0\nwCJpOdThPw45KAIYAM/EXauVaT7yHV53/caiXK913k/BMazegpodpAeUK2nXijMF\nOVzvXMlgq0k7oAr7gFNrdAdOM5MgdXVlFUlOz41NDo6FzswWdPySGws1NeE41TkY\nniiD1vo5nldsdplzUhJ4c8r9esJVMYt3SH7V8Qfk2NRIUqgR9VLi356c3Rw81MUc\npdde6sZJvXrUwb7jnMBu3VOak5CFwlpU/pw4LNkf2y97oIexRkm9XFIMbnF0kN7U\n6sBNLiPDAgMBAAECggEAErNgz8oCZecMNvJyQlYmzOratiw2hYIqd9ejYm2FPbrk\nqCmWdEhp3i5vaQapJIVPa0fDosIbMrQF/9od3CLPMQglaEQKUhiXyZYqc7TYZyyh\n+gAM/eKuc53MDZwB/jENpOl+gYFvHc9WbueuGShKaRi1N/2hlF5KT+Bv1IpZ6pwo\n66yCcUO38hVQGy/prCXtL/B3RCgLjGV1OSq+fpmFwtilu10+5+tsZMDJxRL9D2gK\nCjwwOVbac2nS18crnUl6CcitN93T5HtHAwSLk80zL2uz/cfsfm33DK4+xdjZ120v\nQ3ZBBzDmrAIg3ZpqSeZIm/iYRqISkJcQ1cx3CshnwQKBgQD74c6AhPOvW95QdzaC\nOfTXPfNyMNqUQ8miVM9Hot91GM7Yxf5KgBtQeWVF06id+HI8g+w/J0QhwJhhEM+f\neUnYyCfjKqKb4hiqrq9xjF4KUChvPoPVxUoBY2DQsz8eKDMFLORQWps0h/DamUHD\nCdxGSPXnYVazzBxLFSlU7t1O4QKBgQDc0PN1KOGqlCTAjZKq4qU1LFMzVUI3vmev\nslZnjpkErigwupNAyIozfR6nBkw2rb/sae7nEppkhLizZ7T7O7kq5qHQBmYUPYvi\nmKRGT8TTuhkK+ZZBx2VUxrgfbAtCeY8154vGSTfiLlIJBIe1KhafpecQQcpmoXAc\nQ6rfLA67IwKBgAwsAk2lnx0HRHwA9speQJ2yKbSH9dgaWoEUthuRHFlNRJmnH727\n6RX/d8xjCQ/xNJwGCAGZRSqYYwS1ykK7mrz2Fy9cHRWJXIXLAUFsdhLrgri1fatz\n6Dqe8cvEDbXIXYbPf4z+g+eK9jGqHEpvjIx89B0lUApKP8fFEwU+scUhAoGBAIIH\niVW0fS61je7Vb0ixrhdhwpy32AZ7WRNdMQRKNFFNPN11AMFlVfx78VDppHeOWTYe\nK1Bm5APNI/aBW1GWGbPpm9+j5PiGRZlpyVKeJomHTLfpwVF62XDSlBnsxbSfYHWd\no/FfrEjEfgpRYJiN8ESSrT4lf8pvxlTehABnMUWBAoGBAM/epD78SQNUMgzYBZ/r\nP1RBCCG801C9/By0WmAfjtO3auFrNbCixDQk8No5/9sXireuvTi7GJHyisUL0acP\ndbPN1AnWLSQJkQ/+xWU43Yxlc8xCw/wOhqwtxY4hgIT7kIFStU+/VGXJ0R5JyB7T\npfctq9uSC6n4F2BrR8i/klMz\n-----END PRIVATE KEY-----\n",
+  "client_email": "script-rencontres@importrencontre.iam.gserviceaccount.com",
+  "client_id": "102171077843228725107",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/script-rencontres%40importrencontre.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

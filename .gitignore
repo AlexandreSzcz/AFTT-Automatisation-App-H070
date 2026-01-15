@@ -7,7 +7,3 @@ __pycache__/
 
 # IDE
 .idea/
-
-# Fichiers sensibles
-*.json
-!config/config.json
