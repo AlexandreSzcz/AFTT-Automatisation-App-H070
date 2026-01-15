@@ -1,43 +1,46 @@
-from pathlib import Path
-import json
 import requests
 from bs4 import BeautifulSoup
+import json
+import time
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-import time
+from pathlib import Path
 
-# ================= CHEMINS ROBUSTES =================
+# =====================================================
+# CHEMINS
+# =====================================================
 BASE_DIR = Path(__file__).resolve().parent.parent
 CONFIG_PATH = BASE_DIR / "config" / "config.json"
+JSON_KEYFILE = BASE_DIR / "importrencontre-e0ccf9e96240.json"
 
-# Fichier créé dynamiquement par GitHub Actions
-JSON_KEYFILE = "importrencontre.json"
-
-# ================= LECTURE CONFIG =================
+# =====================================================
+# CONFIG
+# =====================================================
 with open(CONFIG_PATH, "r", encoding="utf-8") as f:
     config = json.load(f)
 
 CLUB_ID = config["CLUB_ID"]
 TEAM_IDS = {team.split("_")[1]: team for team in config["TEAM_IDS"]}
 
-# ================= CONFIG METIER =================
+# =====================================================
+# GOOGLE SHEETS
+# =====================================================
 SPREADSHEET_ID = "1xU4EQLRU8nWz8Wf7zHyj1zS0ZMiD83sHsRFbXF3_PA8"
-SHEET_NAME = "RANKING VETERANS"
-SEMAINE = "22"
+SHEET_NAME = "RANKING"
 
-# ================= GOOGLE SHEETS AUTH =================
 scope = [
     "https://spreadsheets.google.com/feeds",
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive"
 ]
 
-creds = ServiceAccountCredentials.from_json_keyfile_name(JSON_KEYFILE, scope)
+creds = ServiceAccountCredentials.from_json_keyfile_name(
+    str(JSON_KEYFILE), scope
+)
 client = gspread.authorize(creds)
 sheet = client.open_by_key(SPREADSHEET_ID).worksheet(SHEET_NAME)
 sheet.clear()
 
-# ================= HEADERS =================
 headers = [
     "Place", "Nom équipe", "Score",
     "RJ", "RG", "RP", "RN", "FF",
@@ -45,7 +48,8 @@ headers = [
 ]
 sheet.append_row(headers)
 
-# ================= SCRAPING =================
+SEMAINE = "22"
+
 for letter, div_id in TEAM_IDS.items():
     url = (
         f"https://resultats.aftt.be/?div_id={div_id}"
@@ -53,11 +57,10 @@ for letter, div_id in TEAM_IDS.items():
         f"&divcat=0&club_id={CLUB_ID}"
     )
 
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, "html.parser")
+    soup = BeautifulSoup(requests.get(url).text, "html.parser")
 
     div_td = soup.find("td", class_="interclubs_title")
-    division = div_td.get_text(strip=True).split(" -")[0] if div_td else f"Division {letter}"
+    division = div_td.get_text(strip=True).split(" -")[0] if div_td else ""
 
     rows = soup.find_all("tr", class_="DBTable")
     all_rows = []
@@ -86,4 +89,4 @@ for letter, div_id in TEAM_IDS.items():
     sheet.append_rows(all_rows, value_input_option="USER_ENTERED")
     time.sleep(5)
 
-print("✅ Classements vétérans mis à jour")
+print("✅ Classements standard mis à jour")
