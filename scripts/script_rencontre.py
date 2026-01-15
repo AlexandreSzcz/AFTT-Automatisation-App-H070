@@ -1,80 +1,102 @@
 from pathlib import Path
 import json
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
 import re
-import requests
 import time
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 import tkinter
 
-# ================== CHEMINS ROBUSTES ==================
+# =====================================================
+# CHEMINS ROBUSTES
+# =====================================================
 BASE_DIR = Path(__file__).resolve().parent.parent
 CONFIG_PATH = BASE_DIR / "config" / "config.json"
-CREDS_PATH = BASE_DIR / "importrencontre-e0ccf9e96240.json"
 
-# ================== CONFIGURATION ==================
-SPREADSHEET_ID = '1xU4EQLRU8nWz8Wf7zHyj1zS0ZMiD83sHsRFbXF3_PA8'
-BASE_URL = "https://resultats.aftt.be/?div_id={div_id}&menu=3&type=3&week_name=01&club_id={club_id}"
+# Fichier créé dynamiquement par GitHub Actions
+JSON_KEYFILE = "importrencontre.json"
 
+# =====================================================
+# LECTURE CONFIG
+# =====================================================
 with open(CONFIG_PATH, "r", encoding="utf-8") as f:
     config = json.load(f)
 
 CLUB_ID = config["CLUB_ID"]
 TEAM_IDS = {team.split("_")[1]: team for team in config["TEAM_IDS"]}
 
-# ================== GOOGLE SHEETS AUTH ==================
+# =====================================================
+# CONFIGURATION METIER
+# =====================================================
+SPREADSHEET_ID = "1xU4EQLRU8nWz8Wf7zHyj1zS0ZMiD83sHsRFbXF3_PA8"
+SHEET_NAME = "Rencontre"
+BASE_URL = (
+    "https://resultats.aftt.be/?div_id={div_id}"
+    "&menu=3&type=3&week_name=01&club_id={club_id}"
+)
+
+# =====================================================
+# GOOGLE SHEETS AUTH
+# =====================================================
 scope = [
-    'https://spreadsheets.google.com/feeds',
-    'https://www.googleapis.com/auth/spreadsheets',
-    'https://www.googleapis.com/auth/drive'
+    "https://spreadsheets.google.com/feeds",
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive"
 ]
 
-creds = ServiceAccountCredentials.from_json_keyfile_name(str(CREDS_PATH), scope)
+creds = ServiceAccountCredentials.from_json_keyfile_name(JSON_KEYFILE, scope)
 client = gspread.authorize(creds)
-sheet = client.open_by_key(SPREADSHEET_ID).worksheet("Rencontre")
+sheet = client.open_by_key(SPREADSHEET_ID).worksheet(SHEET_NAME)
 sheet.clear()
 
-# ================== HEADERS ==================
+# =====================================================
+# HEADERS
+# =====================================================
 headers = [
-    "semaine", "début de semaine", "Fin de semaine",
-    "Anderlues", "score", "adversaire", "horaire", "heure",
+    "semaine",
+    "début de semaine",
+    "fin de semaine",
+    "Anderlues",
+    "score",
+    "adversaire",
+    "date",
+    "heure",
     "domicile_bool",
-    "Type match",
-    "Icône",
-    "Domicile",
+    "type_match",
+    "icone",
+    "domicile_nom",
     "commentaire"
 ]
 sheet.append_row(headers)
 
-all_rows = []
-
+# =====================================================
+# REGEX SEMAINE
+# =====================================================
 pattern = re.compile(
     r"Semaine\s+(\d+)\s+:\s+Du\s+(\d{2})-(\d{2})-(\d{4})\s+au\s+(\d{2})-(\d{2})-(\d{4})"
 )
 
+all_rows = []
 total_teams = len(TEAM_IDS)
 
-
+# =====================================================
+# TRAITEMENT
+# =====================================================
 def run_rencontre(output=print, progress_callback=None):
     for i, (team_letter, div_id) in enumerate(TEAM_IDS.items(), 1):
         team_name = f"Anderlues {team_letter}"
         url = BASE_URL.format(div_id=div_id, club_id=CLUB_ID)
-        html_file = BASE_DIR / f"Anderlues_{team_letter}.html"
 
         try:
-            output(f"⬇️ Téléchargement de la page pour l'équipe {team_letter}...")
+            output(f"⬇️ Téléchargement HTML équipe {team_letter}")
             response = requests.get(url)
-            with open(html_file, "w", encoding="utf-8") as f:
-                f.write(response.text)
-            output(f"✅ Fichier {html_file.name} enregistré.")
+            response.raise_for_status()
+            soup = BeautifulSoup(response.text, "html.parser")
         except Exception as e:
-            output(f"❌ Erreur téléchargement HTML {team_letter} : {e}")
+            output(f"❌ Erreur téléchargement {team_letter} : {e}")
             continue
-
-        with open(html_file, "r", encoding="utf-8") as file:
-            soup = BeautifulSoup(file.read(), "html.parser")
 
         tables = soup.find_all("table", class_="DBTable_short")
         matchs_extraits = 0
@@ -89,6 +111,7 @@ def run_rencontre(output=print, progress_callback=None):
                 continue
 
             semaine = f"Semaine {int(match.group(1))}"
+
             debut = datetime.strptime(
                 f"{match.group(2)}-{match.group(3)}-{match.group(4)}",
                 "%d-%m-%Y"
@@ -108,7 +131,7 @@ def run_rencontre(output=print, progress_callback=None):
                 equipe_local = cells[2].text.strip()
                 equipe_visiteur = cells[3].text.strip()
 
-                if team_name not in [equipe_local, equipe_visiteur]:
+                if team_name not in (equipe_local, equipe_visiteur):
                     continue
 
                 domicile = "TRUE" if equipe_local == team_name else "FALSE"
@@ -124,7 +147,7 @@ def run_rencontre(output=print, progress_callback=None):
                         date_str.strip()[3:], "%d-%m-%y"
                     ).strftime("%d/%m/%Y")
                     heure_match = heure_str.strip().replace("\xa0", "").replace("**", "")
-                except:
+                except Exception:
                     date_match = ""
                     heure_match = ""
 
@@ -149,14 +172,14 @@ def run_rencontre(output=print, progress_callback=None):
                 matchs_extraits += 1
                 break
 
-        output(f"➡️ {matchs_extraits} match(s) extrait(s) pour l'équipe {team_letter}.\n")
+        output(f"➡️ {matchs_extraits} match(s) extrait(s) pour {team_letter}\n")
         time.sleep(1.5)
 
         if progress_callback:
             progress_callback(i / total_teams)
             try:
                 tkinter._default_root.update_idletasks()
-            except:
+            except Exception:
                 pass
 
     try:
@@ -166,6 +189,9 @@ def run_rencontre(output=print, progress_callback=None):
         output(f"❌ Erreur Google Sheets : {e}")
 
 
+# =====================================================
+# MAIN
+# =====================================================
 def main(output=print, progress_callback=None):
     run_rencontre(output=output, progress_callback=progress_callback)
 
